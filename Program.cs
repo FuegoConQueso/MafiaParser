@@ -20,15 +20,24 @@ namespace MafiaParser
             Console.WriteLine(copyright);
             while(true)
             {
+                Console.WriteLine("\n-----");
                 Console.WriteLine("Choose from the following options (type the option name and press Enter):");
-                if (game != null) //if game is uninitialized
+                if (game == null) //if game is uninitialized
                 {
                     //Console.WriteLine("'New': create a new game.");
                     //Console.WriteLine("'Load': load an existing game.");
-                    Console.WriteLine("'VoteCount:' parse a day thread's html, and provides a vote count.");
+                    Console.WriteLine("'ParseCount': parse a day thread's html, and provides a vote count.");
+                    Console.WriteLine("'LoadCount': load a previously parsed file, and provides a vote count.");
+                    Console.WriteLine("'Help': this function doesn't actually exist. Go to the group post I made for instructions.");
                     Console.WriteLine("'Exit': exit the program.");
                     switch(Console.ReadLine().ToLower())
                     {
+                        case "parsecount":
+                            ParseAndVoteCount();
+                            break;
+                        case "loadcount":
+                            LoadAndVoteCount();
+                            break;
                         case "new":
                             game = NewGame();
                             break;
@@ -80,7 +89,7 @@ namespace MafiaParser
         {
 
             PlayerList players = new PlayerList();
-            Day day = Parser.Parse(inpath, "Out.txt", ref players);
+            Day day = Parser.Parse(inpath, ref players);
             IO.saveDayFile(day, "Out.txt");
             Parser.TallyVotes(ref day, ref players);
             players = new PlayerList();
@@ -125,17 +134,47 @@ namespace MafiaParser
 
         static void ParseAndVoteCount()
         {
-            Console.WriteLine("Enter day file name to load (including .txt extension).");
+            Day day;
+            PlayerList players;
+            Console.WriteLine("Enter unparsed day file name to parse (including .txt extension).");
             try
             {
-                return IO.loadGameFile(Console.ReadLine());
+                players = new PlayerList();
+                day = Parser.Parse(Console.ReadLine(), ref players);
 
             }
             catch (Exception e)
             {
                 Console.WriteLine("Sorry, there was an error loading that file. Please try again.");
-                return null;
+                return;
             }
+
+            Console.WriteLine("Enter a unique name for saving this file. (Recommended: {GameName}Day# )");
+            IO.saveDayFile(day, Console.ReadLine() + ".txt");
+            Console.WriteLine("File Saved.");
+            Console.WriteLine();
+            Parser.TallyVotes(ref day, ref players);
+        }
+
+        static void LoadAndVoteCount()
+        {
+            Day day;
+            PlayerList players;
+            Console.WriteLine("Enter parsed day file name to load (including .txt extension).");
+            try
+            {
+                players = new PlayerList();
+                day = IO.loadDayFile(Console.ReadLine());
+
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Sorry, there was an error loading that file. Please try again.");
+                return;
+            }
+            Console.WriteLine("File Loaded.");
+            Console.WriteLine();
+            Parser.TallyVotes(ref day, ref players);
         }
 
         static void ParseDay(ref Game game)

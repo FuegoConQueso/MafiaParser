@@ -12,13 +12,12 @@ namespace MafiaParser
     class Parser
     {
 
-        public static Day Parse(string inPath, string outPath, ref PlayerList players)
+        public static Day Parse(string inPath, ref PlayerList players)
         {
             List<Comment> comments;
             
 
             inPath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), inPath);
-            outPath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), outPath);
             if (File.Exists(inPath))
             {
 
